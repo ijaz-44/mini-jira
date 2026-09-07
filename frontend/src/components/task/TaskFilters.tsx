@@ -2,9 +2,10 @@
 
 import { useFilterStore } from "@/store/filterStore";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectItem } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
+import { TaskStatus, TaskPriority } from "@/types/task.types";
 
 export function TaskFilters() {
   const { search, status, priority, setSearch, setStatus, setPriority, resetFilters } = useFilterStore();
@@ -21,35 +22,29 @@ export function TaskFilters() {
 
       <div className="flex items-center gap-2 w-full sm:w-auto">
         {/* Status Filter */}
-        <Select value={status} onValueChange={(val: any) => setStatus(val)}>
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
+        <div className="w-35">
+          <Select value={status} onValueChange={(val) => setStatus(val as TaskStatus | "ALL")}>
             <SelectItem value="ALL">All Status</SelectItem>
             <SelectItem value="TODO">To Do</SelectItem>
             <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
             <SelectItem value="IN_REVIEW">In Review</SelectItem>
             <SelectItem value="DONE">Done</SelectItem>
-          </SelectContent>
-        </Select>
+          </Select>
+        </div>
 
         {/* Priority Filter */}
-        <Select value={priority} onValueChange={(val: any) => setPriority(val)}>
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Priority" />
-          </SelectTrigger>
-          <SelectContent>
+        <div className="w-35">
+          <Select value={priority} onValueChange={(val) => setPriority(val as TaskPriority | "ALL")}>
             <SelectItem value="ALL">All Priority</SelectItem>
             <SelectItem value="LOW">Low</SelectItem>
             <SelectItem value="MEDIUM">Medium</SelectItem>
             <SelectItem value="HIGH">High</SelectItem>
             <SelectItem value="URGENT">Urgent</SelectItem>
-          </SelectContent>
-        </Select>
+          </Select>
+        </div>
 
         {/* Reset Button */}
-        <Button variant="outline" size="icon" onClick={resetFilters} title="Reset Filters">
+        <Button variant="outline" size="sm" onClick={resetFilters} title="Reset Filters" className="px-2.5">
           <RotateCcw className="h-4 w-4" />
         </Button>
       </div>

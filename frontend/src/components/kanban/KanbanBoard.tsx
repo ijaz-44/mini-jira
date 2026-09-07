@@ -10,12 +10,19 @@ const COLUMNS: { title: string; status: TaskStatus }[] = [
   { title: "Done", status: "DONE" },
 ];
 
-export function KanbanBoard({ tasks }: { tasks: Task[] }) {
+export function KanbanBoard({ tasks = [] }: { tasks: Task[] }) {
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4">
+    <div className="flex gap-4 overflow-x-auto pb-4 pt-1">
       {COLUMNS.map((col) => {
         const columnTasks = tasks.filter((t) => t.status === col.status);
-        return <KanbanColumn key={col.status} title={col.title} status={col.status} tasks={columnTasks} />;
+        return (
+          <KanbanColumn
+            key={col.status}
+            title={col.title}
+            status={col.status}
+            tasks={columnTasks}
+          />
+        );
       })}
     </div>
   );

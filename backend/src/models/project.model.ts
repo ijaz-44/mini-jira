@@ -5,7 +5,7 @@ const projectSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
     description: { type: String },
-    key: { type: String, required: true, uppercase: true, trim: true },
+   // key: { type: String, required: true, uppercase: true, trim: true },
     owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
     members: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },

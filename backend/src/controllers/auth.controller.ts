@@ -9,7 +9,7 @@ const isProduction = env.NODE_ENV === "production";
 
 const cookieOptions = {
   httpOnly: true,
-  secure: isProduction,
+  secure: isProduction, // Production (HTTPS Vercel) par mandatory TRUE
   sameSite: isProduction ? ("none" as const) : ("lax" as const),
   path: "/",
 };
@@ -19,12 +19,12 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
   res.cookie("accessToken", tokens.accessToken, {
     ...cookieOptions,
-    maxAge: 15 * 60 * 1000, // 15 mins
+    maxAge: 15 * 60 * 1000,
   });
 
   res.cookie("refreshToken", tokens.refreshToken, {
     ...cookieOptions,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   res.status(201).json({
@@ -78,7 +78,6 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-  // ✅ Clean clearCookie call with matching options
   res.clearCookie("accessToken", cookieOptions);
   res.clearCookie("refreshToken", cookieOptions);
 

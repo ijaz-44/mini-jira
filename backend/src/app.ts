@@ -12,10 +12,31 @@ import projectRoutes from "./routes/project.routes.js";
 
 const app = express();
 
+// 1. Mandatory for Vercel Serverless HTTPS Reverse Proxying
+// Iske bina req.secure false rehta hai aur sameSite: "none" cookies block ho jati hain
+app.set("trust proxy", 1);
+
+// Allowed origins setup (Production Frontend + Localhost)
+const allowedOrigins = [
+  "https://mini-jira-iq5x.vercel.app",
+  "http://localhost:3000",
+  "http://localhost:5173",
+  ...(env.CORS_ORIGIN ? [env.CORS_ORIGIN] : []),
+];
+
 app.use(
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -23,8 +44,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
 
-// ⚠️ Vercel Serverless Fix: Connection Middleware
-// Ye check karega ke har request hit hone par DB connect ho
+// Vercel Serverless Fix: Database Connection Middleware
 app.use(async (req, res, next) => {
   try {
     await connectDB();

@@ -5,17 +5,25 @@ import { authService } from "../services/auth.service.js";
 import { appError } from "../utils/appError.js";
 import { env } from "../config/env.js";
 
+// Check if environment is production OR deployed on HTTPS (Vercel)
 const isProduction = env.NODE_ENV === "production";
 
-const cookieOptions = {
-  httpOnly: true,
-  secure: isProduction, // Production (HTTPS Vercel) par mandatory TRUE
-  sameSite: isProduction ? ("none" as const) : ("lax" as const),
-  path: "/",
+// Cross-site cookies (Vercel deployments) mandatory settings
+const getCookieOptions = (req: Request) => {
+  // Agar request HTTPS se aayi hai ya NODE_ENV production hai to true
+  const isSecure = isProduction || req.secure || req.headers["x-forwarded-proto"] === "https";
+
+  return {
+    httpOnly: true,
+    secure: isSecure,
+    sameSite: isSecure ? ("none" as const) : ("lax" as const),
+    path: "/",
+  };
 };
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user, tokens } = await authService.register(req.body);
+  const cookieOptions = getCookieOptions(req);
 
   res.cookie("accessToken", tokens.accessToken, {
     ...cookieOptions,
@@ -35,6 +43,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { user, tokens } = await authService.login(req.body);
+  const cookieOptions = getCookieOptions(req);
 
   res.cookie("accessToken", tokens.accessToken, {
     ...cookieOptions,
@@ -60,6 +69,7 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const tokens = await authService.refresh(token);
+  const cookieOptions = getCookieOptions(req);
 
   res.cookie("accessToken", tokens.accessToken, {
     ...cookieOptions,
@@ -78,6 +88,8 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
+  const cookieOptions = getCookieOptions(req);
+
   res.clearCookie("accessToken", cookieOptions);
   res.clearCookie("refreshToken", cookieOptions);
 
@@ -117,6 +129,7 @@ export const updateRole = asyncHandler(async (req: Request, res: Response) => {
     req.user.id,
     validRole
   );
+  const cookieOptions = getCookieOptions(req);
 
   res.cookie("accessToken", tokens.accessToken, {
     ...cookieOptions,

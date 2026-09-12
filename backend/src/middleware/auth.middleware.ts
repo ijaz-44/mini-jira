@@ -8,23 +8,31 @@ export const authenticate = (
   res: Response,
   next: NextFunction
 ) => {
-  // 1. Direct req.cookies se accessToken read karein
-  // 2. Fallback check for Authorization: Bearer  header (Postman / mobile support)
-  const token =
-    req.cookies?.accessToken ||
-    (req.headers.authorization?.startsWith("Bearer ")
-      ? req.headers.authorization.split(" ")[1]
-      : null);
+  let token: string | null = null;
 
+  // 1. First preference: Check Cookies
+  if (req.cookies && req.cookies.accessToken) {
+    token = req.cookies.accessToken;
+  }
+
+  // 2. Fallback: Check Authorization Header (Bearer Token)
+  if (!token && req.headers.authorization) {
+    const authHeader = req.headers.authorization.trim();
+    if (authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1] || null;
+    }
+  }
+
+  // 3. Token missing verification
   if (!token) {
     return next(new appError("Authentication required. Token missing.", 401));
   }
 
   try {
     const decoded = verifyAccessToken(token);
-    req.user = decoded;
+    req.user = decoded as any;
     next();
   } catch (error) {
-    next(new appError("Invalid or expired access token.", 401));
+    return next(new appError("Invalid or expired access token.", 401));
   }
 };

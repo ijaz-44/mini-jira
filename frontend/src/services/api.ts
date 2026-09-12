@@ -1,11 +1,22 @@
 import axios from "axios";
 
-// Clean base URL sanitization without regex syntax bugs
-const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-const cleanBaseUrl = rawBaseUrl.replace(/\/+\(/, "").replace(/\/api\/v1\/?\)/, "");
+// Clean Base URL Normalization
+const getBaseUrl = () => {
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  
+  // Trailing slash strip karein agar mojood ho
+  let cleanUrl = rawUrl.trim().replace(/\/+$/, "");
+  
+  // Agar URL mein pehle se `/api/v1` nahi hai to append karein
+  if (!cleanUrl.endsWith("/api/v1")) {
+    cleanUrl = `${cleanUrl}/api/v1`;
+  }
+  
+  return cleanUrl;
+};
 
 export const api = axios.create({
-  baseURL: `${cleanBaseUrl}/api/v1`,
+  baseURL: getBaseUrl(),
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -65,8 +76,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Explicitly pass credentials to ensure cookie is attached
-        await api.post("/auth/refresh", {}, { withCredentials: true });
+        await api.post("/auth/refresh");
         processQueue();
         return api(originalRequest);
       } catch (refreshError) {

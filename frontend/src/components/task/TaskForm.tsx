@@ -51,11 +51,8 @@ export function TaskForm({ projectId, initialData, onSuccess }: TaskFormProps) {
   const selectedStatus = watch("status");
   const selectedPriority = watch("priority");
 
-  useEffect(() => {
-    if (projectId) {
-      setValue("projectId", projectId);
-    }
 
+  useEffect(() => {
     if (initialData) {
       reset({
         title: initialData.title,
@@ -63,11 +60,14 @@ export function TaskForm({ projectId, initialData, onSuccess }: TaskFormProps) {
         projectId: initialData.projectId || projectId,
         status: (initialData.status as TaskStatus) || "TODO",
         priority: (initialData.priority as TaskPriority) || "MEDIUM",
-        assignedTo: (initialData as Record<string, any>)?.assignedTo || "",
+        assignedTo: (initialData as any)?.assignedTo || "",
       });
+    } else if (projectId) {
+      setValue("projectId", projectId, { shouldDirty: true });
     }
-  }, [initialData, projectId, reset, setValue]);
-
+  }, [initialData?.id, (initialData as any)?._id, projectId, reset, setValue]);
+  
+  
   const onSubmit: SubmitHandler<TaskFormOutput> = async (data) => {
     try {
       if (isEditing && initialData) {

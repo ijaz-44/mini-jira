@@ -1,7 +1,11 @@
 import axios from "axios";
 
+// Automatically sanitize and ensure clean /api/v1 pathing
+const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const cleanBaseUrl = rawBaseUrl.replace(/\/+\(/, "").replace(/\/api\/v1\/?\)/, "");
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: `${cleanBaseUrl}/api/v1`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -32,9 +36,10 @@ api.interceptors.response.use(
 
     // Direct network failure ya server unavailable (ERR_CONNECTION_REFUSED)
     if (!error.response) {
-      const message = error.message === "Network Error" 
-        ? "Server inaccessible or connection refused" 
-        : error.message;
+      const message =
+        error.message === "Network Error"
+          ? "Server inaccessible or connection refused"
+          : error.message;
       const customError = new Error(message) as any;
       customError.status = 503;
       return Promise.reject(customError);

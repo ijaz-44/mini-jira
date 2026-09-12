@@ -19,9 +19,8 @@ const envSchema = z.object({
 const _env = envSchema.safeParse(process.env);
 
 if (!_env.success) {
-  console.error("❌ Invalid environment variables:", _env.error.format());
+  console.error("❌ Invalid environment variables:", JSON.stringify(_env.error.format(), null, 2));
+  throw new Error("Missing required environment variables. Check server logs above.");
 }
 
-export const env = _env.success
-  ? _env.data
-  : (process.env as unknown as z.infer<typeof envSchema>);
+export const env = _env.data;

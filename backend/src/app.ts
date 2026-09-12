@@ -13,22 +13,29 @@ import projectRoutes from "./routes/project.routes.js";
 const app = express();
 
 // 1. Mandatory for Vercel Serverless HTTPS Reverse Proxying
-// Iske bina req.secure false rehta hai aur sameSite: "none" cookies block ho jati hain
 app.set("trust proxy", 1);
 
-// Allowed origins setup (Production Frontend + Localhost)
-const allowedOrigins = [
-  "https://mini-jira-iq5x.vercel.app",
-  "http://localhost:3000",
-  "http://localhost:5173",
-  ...(env.CORS_ORIGIN ? [env.CORS_ORIGIN] : []),
-];
+// Helper function to validate allowed origins dynamically
+const isAllowedOrigin = (origin: string | undefined): boolean => {
+  // Postman / Curl / Mobile Apps allow karein
+  if (!origin) return true;
+
+  // Localhost (Development) allow karein
+  if (origin.startsWith("http://localhost:")) return true;
+
+  // Vercel ke tamam subdomains (Production + Preview Deployments) allow karein
+  if (origin.endsWith(".vercel.app")) return true;
+
+  // Specific CORS_ORIGIN env variable (agar set ho)
+  if (env.CORS_ORIGIN && origin === env.CORS_ORIGIN) return true;
+
+  return false;
+};
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// Automatically sanitize and ensure clean /api/v1 pathing
+// Clean base URL sanitization without regex syntax bugs
 const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const cleanBaseUrl = rawBaseUrl.replace(/\/+\(/, "").replace(/\/api\/v1\/?\)/, "");
 
@@ -65,13 +65,17 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await api.post("/auth/refresh");
+        // Explicitly pass credentials to ensure cookie is attached
+        await api.post("/auth/refresh", {}, { withCredentials: true });
         processQueue();
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError);
 
-        if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+        if (
+          typeof window !== "undefined" &&
+          !window.location.pathname.startsWith("/login")
+        ) {
           window.location.href = "/login";
         }
 
@@ -82,7 +86,8 @@ api.interceptors.response.use(
     }
 
     // Backend error payload aur status code preserve karein
-    const message = error.response?.data?.message || error.message || "Something went wrong";
+    const message =
+      error.response?.data?.message || error.message || "Something went wrong";
     const customError = new Error(message) as any;
     customError.status = error.response?.status;
     customError.response = error.response;

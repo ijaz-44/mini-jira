@@ -1,9 +1,9 @@
+// src/services/auth.service.ts
 import bcrypt from "bcryptjs";
 import { User } from "../models/user.model.js";
 import { appError } from "../utils/appError.js";
 import { generateTokens, verifyRefreshToken } from "../utils/jwt.js";
 
-// Type export ki hai taake TypeScript type mismatch error solve ho jaye
 export type UserRole = "ADMIN" | "MANAGER" | "EMPLOYEE";
 
 export class authService {
@@ -44,7 +44,7 @@ export class authService {
   static async login(data: any) {
     const user = await User.findOne({
       email: data.email,
-    }).select("+password");
+    }).select("+password +refreshToken");
 
     if (!user || !(await bcrypt.compare(data.password, user.password))) {
       throw new appError("Invalid credentials", 401);
@@ -94,17 +94,14 @@ export class authService {
       throw new appError("User not found", 404);
     }
 
-    // Explicit type casting for Mongoose Schema assignment
     user.role = role as UserRole;
 
-    // Generate new access & refresh tokens with updated role
     const tokens = generateTokens({
       id: user._id.toString(),
       role: user.role,
       email: user.email,
     });
 
-    // Sync updated refresh token in Database
     user.refreshToken = tokens.refreshToken;
     await user.save();
 
@@ -120,11 +117,18 @@ export class authService {
   }
 
   static async refresh(refreshToken: string) {
-    const decoded = verifyRefreshToken(refreshToken);
+    let decoded: any;
 
+    try {
+      decoded = verifyRefreshToken(refreshToken);
+    } catch (err) {
+      throw new appError("Invalid or expired refresh token", 401);
+    }
+
+    // Explicitly select refreshToken from DB
     const user = await User.findById(decoded.id).select("+refreshToken");
 
-    if (!user || user.refreshToken !== refreshToken) {
+    if (!user || !user.refreshToken || user.refreshToken !== refreshToken) {
       throw new appError("Invalid refresh token", 401);
     }
 

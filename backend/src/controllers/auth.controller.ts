@@ -3,14 +3,14 @@ import type { Request, Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { authService } from "../services/auth.service.js";
 import { appError } from "../utils/appError.js";
-import { env } from "../config/env.js"; // 👈 Import env
+import { env } from "../config/env.js";
 
 const isProduction = env.NODE_ENV === "production";
 
 const cookieOptions = {
   httpOnly: true,
-  secure: isProduction, // Production par TRUE hoga, localhost par FALSE
-  sameSite: isProduction ? ("none" as const) : ("lax" as const), // Cross-origin cookies ke liye 'none'
+  secure: isProduction,
+  sameSite: isProduction ? ("none" as const) : ("lax" as const),
   path: "/",
 };
 
@@ -78,8 +78,9 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-  res.clearCookie("accessToken", { ...cookieOptions, path: "/" });
-  res.clearCookie("refreshToken", { ...cookieOptions, path: "/" });
+  // ✅ Clean clearCookie call with matching options
+  res.clearCookie("accessToken", cookieOptions);
+  res.clearCookie("refreshToken", cookieOptions);
 
   res.status(200).json({
     success: true,
@@ -88,7 +89,11 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getMe = asyncHandler(async (req: Request, res: Response) => {
-  const user = await authService.getUserById(req.user!.id);
+  if (!req.user?.id) {
+    throw new appError("Unauthorized request.", 401);
+  }
+
+  const user = await authService.getUserById(req.user.id);
 
   res.status(200).json({
     success: true,
@@ -105,8 +110,12 @@ export const updateRole = asyncHandler(async (req: Request, res: Response) => {
 
   const validRole = role as "ADMIN" | "MANAGER" | "EMPLOYEE";
 
+  if (!req.user?.id) {
+    throw new appError("Unauthorized request.", 401);
+  }
+
   const { user, tokens } = await authService.updateRole(
-    req.user!.id,
+    req.user.id,
     validRole
   );
 

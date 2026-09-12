@@ -7,6 +7,11 @@ const taskSchema = new Schema(
     title: { type: String, required: true, trim: true },
     description: { type: String },
     status: { type: String, enum: Object.values(TASK_STATUS), default: TASK_STATUS.TODO },
+    priority: { 
+      type: String, 
+      enum: ["LOW", "MEDIUM", "HIGH", "URGENT"], 
+      default: "MEDIUM" 
+    },
     project: { type: Schema.Types.ObjectId, ref: "Project", required: true },
     assignee: { type: Schema.Types.ObjectId, ref: "User" },
     reporter: { type: Schema.Types.ObjectId, ref: "User", required: true },

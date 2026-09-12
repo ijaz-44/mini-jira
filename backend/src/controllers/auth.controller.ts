@@ -3,12 +3,14 @@ import type { Request, Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { authService } from "../services/auth.service.js";
 import { appError } from "../utils/appError.js";
+import { env } from "../config/env.js"; // 👈 Import env
+
+const isProduction = env.NODE_ENV === "production";
 
 const cookieOptions = {
   httpOnly: true,
-  // signed: true,
-  secure: false, // env.NODE_ENV === "production",
-  sameSite: "lax" as const,
+  secure: isProduction, // Production par TRUE hoga, localhost par FALSE
+  sameSite: isProduction ? ("none" as const) : ("lax" as const), // Cross-origin cookies ke liye 'none'
   path: "/",
 };
 
@@ -76,8 +78,8 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-  res.clearCookie("accessToken", { path: "/" });
-  res.clearCookie("refreshToken", { path: "/" });
+  res.clearCookie("accessToken", { ...cookieOptions, path: "/" });
+  res.clearCookie("refreshToken", { ...cookieOptions, path: "/" });
 
   res.status(200).json({
     success: true,
@@ -85,7 +87,6 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-// 1. UPDATED: Fetch latest user state directly from DB instead of returning static decoded token
 export const getMe = asyncHandler(async (req: Request, res: Response) => {
   const user = await authService.getUserById(req.user!.id);
 
@@ -95,7 +96,6 @@ export const getMe = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-// 2. UPDATED: Sync both access and refresh cookies with new role credentials
 export const updateRole = asyncHandler(async (req: Request, res: Response) => {
   const { role } = req.body;
 
@@ -110,13 +110,11 @@ export const updateRole = asyncHandler(async (req: Request, res: Response) => {
     validRole
   );
 
-  // Set updated Access Token cookie
   res.cookie("accessToken", tokens.accessToken, {
     ...cookieOptions,
     maxAge: 15 * 60 * 1000,
   });
 
-  // Set updated Refresh Token cookie
   res.cookie("refreshToken", tokens.refreshToken, {
     ...cookieOptions,
     maxAge: 7 * 24 * 60 * 60 * 1000,

@@ -56,12 +56,13 @@ api.interceptors.response.use(
       return Promise.reject(customError);
     }
 
-    // Refresh, Login, Register, Logout routes par 401 retry skip karein
+    // Auth endpoints jin par 401 aane par retry/refresh SKIP karna hai
     const isAuthRoute =
       originalRequest.url?.includes("/auth/refresh") ||
       originalRequest.url?.includes("/auth/login") ||
       originalRequest.url?.includes("/auth/register") ||
-      originalRequest.url?.includes("/auth/logout");
+      originalRequest.url?.includes("/auth/logout") ||
+      originalRequest.url?.includes("/auth/me"); // Loop prevent karne ke liye /auth/me include kiya gaya hai
 
     if (error.response.status === 401 && !originalRequest._retry && !isAuthRoute) {
       if (isRefreshing) {

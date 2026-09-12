@@ -13,7 +13,9 @@ export const useAuth = () => {
   } = useQuery({
     queryKey: ["auth-user"],
     queryFn: authService.getProfile,
-    retry: false,
+    retry: false, // 401 aane par retry na karein
+    retryOnMount: false, // Unauthenticated status ko remount par re-fetch nahi karna
+    refetchOnWindowFocus: false, // Window switch hone par unwanted call na ho
     staleTime: 1000 * 60 * 5, // 5 mins cache
   });
 
@@ -59,12 +61,16 @@ export const useAuth = () => {
   const logoutMutation = useMutation({
     mutationFn: authService.logout,
     onSuccess: () => {
-      // Clear all queries or reset auth cache
+      // Reset auth query state explicitly
       queryClient.setQueryData(["auth-user"], null);
-      queryClient.invalidateQueries({ queryKey: ["auth-user"] });
+      // Clean entire query cache to stop background refetches post-logout
+      queryClient.clear();
     },
     onError: (err) => {
       console.error("Logout Error:", getErrorMessage(err));
+      // Error ke bawajood client state clean kar dein
+      queryClient.setQueryData(["auth-user"], null);
+      queryClient.clear();
     },
   });
 

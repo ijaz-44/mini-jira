@@ -1,5 +1,5 @@
 // src/services/auth.service.ts
-import bcrypt from "bcrypt.js";
+import bcrypt from "bcryptjs";
 import { User } from "../models/user.model.js";
 import { appError } from "../utils/appError.js";
 import { generateTokens, verifyRefreshToken } from "../utils/jwt.js";

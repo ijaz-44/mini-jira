@@ -15,19 +15,14 @@ export const useProjects = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       // Error is handled by UI toast/notification
     },
   });
 
   const updateProjectMutation = useMutation({
     mutationFn: ({
-      projectId,
-      data,
-    }: {
-      projectId: string;
-      data: Partial<CreateProjectInput>;
-    }) => projectService.updateProject(projectId, data),
+      projectId, data}: {projectId: string, data: Partial<CreateProjectInput>}) => projectService.updateProject(projectId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
     },

@@ -11,12 +11,12 @@ interface FilterState {
   resetFilters: () => void;
 }
 
-export const useFilterStore = create<FilterState>((set) => ({
+export const useFilterStore = create<FilterState>((set: any) => ({
   search: "",
   status: "ALL",
   priority: "ALL",
-  setSearch: (search) => set({ search }),
-  setStatus: (status) => set({ status }),
-  setPriority: (priority) => set({ priority }),
+  setSearch: (search: any) => set({ search }),
+  setStatus: (status: any) => set({ status }),
+  setPriority: (priority: any) => set({ priority }),
   resetFilters: () => set({ search: "", status: "ALL", priority: "ALL" }),
 }));

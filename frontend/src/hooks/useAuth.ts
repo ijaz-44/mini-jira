@@ -6,11 +6,7 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
 
   // 1. Fetch Authenticated User
-  const {
-    data: user,
-    isLoading,
-    error,
-  } = useQuery({
+  const {data: user, isLoading, error} = useQuery({
     queryKey: ["auth-user"],
     queryFn: authService.getProfile,
     retry: false, // 401 aane par retry na karein
@@ -48,7 +44,7 @@ export const useAuth = () => {
     mutationFn: authService.updateRole,
     onSuccess: async (updatedUser) => {
       // Direct update React Query Cache with updated User object
-      queryClient.setQueryData(["auth-user"], updatedUser);
+      queryClient.setQueryData(["auth-user"], updatedUser.user);
       // Invalidate to make sure server state is perfectly synced
       await queryClient.invalidateQueries({ queryKey: ["auth-user"] });
     },

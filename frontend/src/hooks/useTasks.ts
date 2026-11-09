@@ -5,17 +5,6 @@ import { useDebounce } from "./useDebounce";
 import { Task, TaskStatus } from "@/types/task.types";
 import { CreateTaskInput, UpdateTaskInput } from "@/lib/validations/task.schema";
 
-interface TasksApiResponse {
-  success?: boolean;
-  tasks?: Task[];
-  total?: number;
-  page?: number;
-  limit?: number;
-  totalPages?: number;
-}
-
-type QueryData = TasksApiResponse | Task[];
-
 export const useTasks = (projectId?: string) => {
   const queryClient = useQueryClient();
   const { search, status, priority } = useFilterStore();
@@ -36,56 +25,22 @@ export const useTasks = (projectId?: string) => {
     queryFn: () => taskService.getTasks(queryParams),
   });
 
-  // Safe Extractor for Tasks Array & MongoDB _id normalization
-  const extractTasks = (data: unknown): Task[] => {
-    if (!data) return [];
-    let list: Task[] = [];
-
-    if (Array.isArray(data)) {
-      list = data;
-    } else if (
-      typeof data === "object" &&
-      data !== null &&
-      "tasks" in data &&
-      Array.isArray((data as TasksApiResponse).tasks)
-    ) {
-      list = (data as TasksApiResponse).tasks || [];
-    }
-
-    return list.map((task) => ({
-      ...task,
-      id: task.id || (task as { _id?: string })._id || "",
-    }));
+  // Prepend helper
+  const prependToActiveQuery = (newTask: Task) => {
+    queryClient.setQueryData<Task[]>(QUERY_KEY, (oldData = []) => {
+      return [newTask, ...oldData];
+    });
   };
 
-  // Helper function to mutate cache cleanly without touching unrelated queries
-  const updateCache = (
-    updater: (task: Task) => Task | null,
-    prependTask?: Task
-  ) => {
-    queryClient.setQueriesData<QueryData>(
+  // Cache updater helper
+  const updateCacheEntries = (updater: (task: Task) => Task | null) => {
+    queryClient.setQueriesData<Task[]>(
       { queryKey: ["tasks"] },
       (oldData) => {
-        if (!oldData) return prependTask ? [prependTask] : oldData;
-
-        if (Array.isArray(oldData)) {
-          if (prependTask) return [prependTask, ...oldData];
-          return oldData
-            .map(updater)
-            .filter((t): t is Task => t !== null);
-        }
-
-        if ("tasks" in oldData && Array.isArray(oldData.tasks)) {
-          const updatedList = prependTask
-            ? [prependTask, ...oldData.tasks]
-            : oldData.tasks
-                .map(updater)
-                .filter((t): t is Task => t !== null);
-
-          return { ...oldData, tasks: updatedList };
-        }
-
-        return oldData;
+        if (!oldData || !Array.isArray(oldData)) return oldData;
+        return oldData
+          .map(updater)
+          .filter((t): t is Task => t !== null);
       }
     );
   };
@@ -108,7 +63,8 @@ export const useTasks = (projectId?: string) => {
         createdAt: new Date().toISOString(),
       };
 
-      updateCache((task) => task, tempTask);
+      // Yahan purana updateCache hata kar naya helper laga diya hai
+      prependToActiveQuery(tempTask);
 
       return { previousTasksData };
     },
@@ -124,7 +80,7 @@ export const useTasks = (projectId?: string) => {
     },
   });
 
-  // 3. Update Task Mutation (Handles both status update & detail updates cleanly)
+  // 3. Update Task Mutation
   const updateTaskMutation = useMutation({
     mutationFn: ({ taskId, data }: { taskId: string; data: Partial<UpdateTaskInput> }) =>
       taskService.updateTask(taskId, data),
@@ -132,7 +88,8 @@ export const useTasks = (projectId?: string) => {
       await queryClient.cancelQueries({ queryKey: ["tasks"] });
       const previousTasksData = queryClient.getQueriesData({ queryKey: ["tasks"] });
 
-      updateCache((task) => {
+      // Yahan bhi updateCache ki jagah updateCacheEntries use ho raha hai
+      updateCacheEntries((task) => {
         if (task.id === taskId || (task as { _id?: string })._id === taskId) {
           return { ...task, ...data };
         }
@@ -164,7 +121,8 @@ export const useTasks = (projectId?: string) => {
       await queryClient.cancelQueries({ queryKey: ["tasks"] });
       const previousTasksData = queryClient.getQueriesData({ queryKey: ["tasks"] });
 
-      updateCache((task) => {
+      // Yahan bhi updateCache ki jagah updateCacheEntries use ho raha hai
+      updateCacheEntries((task) => {
         if (task.id === taskId || (task as { _id?: string })._id === taskId) {
           return null; // Remove from list
         }
@@ -186,7 +144,7 @@ export const useTasks = (projectId?: string) => {
   });
 
   return {
-    tasks: extractTasks(tasksQuery.data),
+    tasks: tasksQuery.data ?? [], // Yeh miss ho gaya tha, ab tasks array component ko mil jayegi!
     isLoading: tasksQuery.isLoading,
     isError: tasksQuery.isError,
     refetch: tasksQuery.refetch,

@@ -44,7 +44,7 @@ export const useAuth = () => {
     mutationFn: authService.updateRole,
     onSuccess: async (updatedUser) => {
       // Direct update React Query Cache with updated User object
-      queryClient.setQueryData(["auth-user"], updatedUser.user);
+      queryClient.setQueryData(["auth-user"], updatedUser);
       // Invalidate to make sure server state is perfectly synced
       await queryClient.invalidateQueries({ queryKey: ["auth-user"] });
     },

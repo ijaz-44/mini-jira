@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api } from "@/lib/api";
 import { Task, TaskStatus } from "@/types/task.types";
 import { CreateTaskInput, UpdateTaskInput } from "@/lib/validations/task.schema";
 

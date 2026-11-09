@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api } from "@/lib/api";
 import { ApiResponse } from "@/types/api.types";
 import { Project } from "../types/project.types";
 import { CreateProjectInput } from "@/lib/validations/project.schema";

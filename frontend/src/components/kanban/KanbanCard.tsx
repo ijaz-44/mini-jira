@@ -27,19 +27,18 @@ export function KanbanCard({task, onEdit, onDelete, dragHandleProps}: KanbanCard
 
   return (
     <div className="relative bg-card text-card-foreground p-3.5 rounded-lg border border-border shadow-xs hover:shadow-md transition-all">
-      {/* Header: Drag Handle + Title + Permanent 3-Dot Dropdown */}
-      <div className="flex items-start justify-between gap-2 mb-2">
+      
+      {/* HEADER: Poore header par dragHandleProps laga diye hain aur icon bhi mojood hai */}
+      <div 
+        {...dragHandleProps}
+        className="flex items-start justify-between gap-2 mb-2 cursor-grab active:cursor-grabbing select-none"
+      >
         
-        {/* Drag Handle (Left Side) & Title */}
+        {/* Grip Icon + Title */}
         <div className="flex items-start gap-1.5 flex-1 min-w-0 pr-6">
-          <button
-            type="button"
-            {...dragHandleProps}
-            className="cursor-grab active:cursor-grabbing text-muted-foreground/60 hover:text-foreground mt-0.5 shrink-0"
-            title="Drag task"
-          >
+          <div className="text-muted-foreground/60 mt-0.5 shrink-0">
             <GripVertical className="h-4 w-4" />
-          </button>
+          </div>
 
           <h4 className="text-sm font-semibold line-clamp-2 text-foreground">
             {task.title}
@@ -50,8 +49,8 @@ export function KanbanCard({task, onEdit, onDelete, dragHandleProps}: KanbanCard
         <div className="absolute top-3 right-3 z-20">
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none"
-              onClick={(e) => e.stopPropagation()}
+              className="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none cursor-pointer"
+              onClick={(e) => e.stopPropagation()} // Yeh zaroori hai taake dropdown click par drag trigger na ho
             >
               <MoreVertical className="h-4 w-4" />
               <span className="sr-only">Actions</span>

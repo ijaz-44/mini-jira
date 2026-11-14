@@ -2,6 +2,7 @@
 
 import { Task, TaskStatus } from "@/types/task.types";
 import { KanbanCard } from "./KanbanCard";
+import { useTasks } from "@/hooks/useTasks";
 
 interface KanbanColumnProps {
   title: string;
@@ -11,9 +12,24 @@ interface KanbanColumnProps {
   onDeleteTask?: (taskId: string) => void;
 }
 
-export function KanbanColumn({ title, tasks, onEditTask, onDeleteTask }: KanbanColumnProps) {
+export function KanbanColumn({ title, status, tasks, onEditTask, onDeleteTask }: KanbanColumnProps) {
+  const { updateStatus } = useTasks();
+
+  // Jab card ko is column par drop kiya jaye
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData("text/plain");
+    if (taskId) {
+      updateStatus?.(taskId, status);
+    }
+  };
+
   return (
-    <div className="flex-1 bg-muted/40 p-4 rounded-xl min-w-70 flex flex-col space-y-3 border border-border">
+    <div 
+      onDragOver={(e) => e.preventDefault()} // Drop allow karne ke liye yeh lazni hai
+      onDrop={handleDrop}
+      className="flex-1 bg-muted/40 p-4 rounded-xl min-w-70 flex flex-col space-y-3 border border-border"
+    >
       <div className="flex items-center justify-between pb-2 border-b border-border">
         <h3 className="text-sm font-bold text-foreground">{title}</h3>
         <span className="text-xs font-bold px-2.5 py-0.5 bg-muted text-muted-foreground rounded-full">
@@ -27,14 +43,24 @@ export function KanbanColumn({ title, tasks, onEditTask, onDeleteTask }: KanbanC
             No tasks
           </div>
         ) : (
-          tasks.map((task) => (
-            <KanbanCard 
-              key={task.id || task._id} 
-              task={task} 
-              onEdit={onEditTask}
-              onDelete={onDeleteTask}
-            />
-          ))
+          tasks.map((task) => {
+            const taskId = task.id || task._id || "";
+            return (
+              <KanbanCard 
+                key={taskId} 
+                task={task} 
+                onEdit={onEditTask}
+                onDelete={onDeleteTask}
+                dragHandleProps={{
+                  draggable: true,
+                  onDragStart: (e: React.DragEvent) => {
+                    e.stopPropagation();
+                    e.dataTransfer.setData("text/plain", taskId);
+                  },
+                }}
+              />
+            );
+          })
         )}
       </div>
     </div>

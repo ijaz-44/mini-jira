@@ -63,6 +63,13 @@ export default function TasksPage() {
                   </div>
 
                   <div className="flex items-center gap-4">
+                    {/* Due Date added here */}
+                    {task.dueDate && (
+                      <span className="text-xs text-muted-foreground hidden sm:inline-block">
+                        {new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      </span>
+                    )}
+
                     <span className="text-xs px-2.5 py-1 bg-secondary text-secondary-foreground rounded font-medium">
                       {task.status}
                     </span>

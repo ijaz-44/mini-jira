@@ -2,12 +2,7 @@
 
 import { Task } from "@/types/task.types";
 import { MoreVertical, Edit2, Trash2, Calendar, GripVertical } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 
 interface ExtendedTask extends Task {
   dueDate?: string | Date;
@@ -20,12 +15,7 @@ interface KanbanCardProps {
   dragHandleProps?: Record<string, unknown>;
 }
 
-export function KanbanCard({
-  task,
-  onEdit,
-  onDelete,
-  dragHandleProps,
-}: KanbanCardProps) {
+export function KanbanCard({task, onEdit, onDelete, dragHandleProps}: KanbanCardProps) {
   const taskId = task.id || task._id || "";
 
   const priorityColors: Record<string, string> = {

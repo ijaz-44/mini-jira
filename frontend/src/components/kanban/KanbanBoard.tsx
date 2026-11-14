@@ -10,7 +10,11 @@ const COLUMNS: { title: string; status: TaskStatus }[] = [
   { title: "Done", status: "DONE" },
 ];
 
-export function KanbanBoard({ tasks = [] }: { tasks: Task[] }) {
+export function KanbanBoard({ tasks = [], onEditTask, onDeleteTask }: { 
+  tasks: Task[];
+  onEditTask?: (task: Task) => void;
+  onDeleteTask?: (taskId: string) => void; 
+}) {
   return (
     <div className="flex gap-4 overflow-x-auto pb-4 pt-1">
       {COLUMNS.map((col) => {
@@ -21,6 +25,8 @@ export function KanbanBoard({ tasks = [] }: { tasks: Task[] }) {
             title={col.title}
             status={col.status}
             tasks={columnTasks}
+            onEditTask={onEditTask}
+            onDeleteTask={onDeleteTask}            
           />
         );
       })}

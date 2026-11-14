@@ -73,6 +73,7 @@ export default function TaskDetailsModal() {
             </h2>
           </div>
 
+          
           {/* Properties Grid */}
           <div className="grid grid-cols-2 gap-4 p-4 bg-muted/20 border border-border rounded-lg text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">
@@ -82,6 +83,7 @@ export default function TaskDetailsModal() {
                 {selectedTask?.status || "N/A"}
               </span>
             </div>
+
             <div className="flex items-center gap-2 text-muted-foreground">
               <Tag className="w-4 h-4 text-destructive" />
               <span>Priority:</span>
@@ -89,17 +91,26 @@ export default function TaskDetailsModal() {
                 {selectedTask?.priority || "N/A"}
               </span>
             </div>
+
             <div className="flex items-center gap-2 text-muted-foreground">
               <User className="w-4 h-4" />
               <span>Assignee:</span>
-              <span className="font-medium text-foreground text-xs">Unassigned</span>
+              <span className="font-medium text-foreground text-xs">
+                {selectedTask?.assignedTo || "Unassigned"}
+              </span>
             </div>
+
+            {/* Due Date field yahan add kar di hai */}
             <div className="flex items-center gap-2 text-muted-foreground">
               <Calendar className="w-4 h-4" />
-              <span>Created At:</span>
-              <span className="font-medium text-foreground text-xs">Recent</span>
-            </div>
+              <span>Due Date:</span>
+              <span className="font-medium text-foreground text-xs">
+                {selectedTask?.dueDate 
+                  ? new Date(selectedTask.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                  : "No due date"}
+            </span>
           </div>
+        </div>
 
           {/* Description */}
           <div className="space-y-2">

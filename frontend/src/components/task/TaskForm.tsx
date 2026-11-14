@@ -29,14 +29,7 @@ export function TaskForm({ projectId, initialData, onSuccess }: TaskFormProps) {
   // Safely extract assignedTo if present on initialData
   const initialAssignedTo = (initialData as Record<string, any>)?.assignedTo || "";
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<TaskFormInput, any, TaskFormOutput>({
+  const { register, handleSubmit, setValue, watch, reset, formState: { errors, isSubmitting }} = useForm<TaskFormInput, any, TaskFormOutput>({
     resolver: zodResolver(createTaskSchema),
     defaultValues: {
       title: initialData?.title || "",

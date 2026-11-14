@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, FormEvent } from "react";
 import { useTasks } from "@/hooks/useTasks";
 import { useProjects } from "@/hooks/useProjects";
@@ -18,6 +20,7 @@ export function CreateTaskModal({ isOpen, onClose, taskToEdit }: CreateTaskModal
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<Task["priority"]>("MEDIUM");
   const [projectId, setProjectId] = useState("");
+  const [dueDate, setDueDate] = useState(""); // <-- Nayi state due date ke liye
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getId = (item: { id?: string; _id?: string }) => item?.id || item?._id || "";
@@ -32,11 +35,20 @@ export function CreateTaskModal({ isOpen, onClose, taskToEdit }: CreateTaskModal
       setDescription(taskToEdit.description || "");
       setPriority(taskToEdit.priority || "MEDIUM");
       setProjectId(taskToEdit.projectId || defaultProjectId);
+      
+      // Agar taskToEdit mein due date mojood hai to usko format kar ke set kar dein (YYYY-MM-DD)
+      if (taskToEdit.dueDate) {
+        const dateObj = new Date(taskToEdit.dueDate);
+        setDueDate(isNaN(dateObj.getTime()) ? "" : dateObj.toISOString().split('T')[0]);
+      } else {
+        setDueDate("");
+      }
     } else {
       setTitle("");
       setDescription("");
       setPriority("MEDIUM");
       setProjectId(defaultProjectId);
+      setDueDate("");
     }
   }, [taskToEdit, isOpen]);
 
@@ -61,6 +73,7 @@ export function CreateTaskModal({ isOpen, onClose, taskToEdit }: CreateTaskModal
               description: description.trim(),
               priority,
               projectId: selectedProjectId,
+              dueDate: dueDate ? new Date(dueDate) : undefined, // <-- Yahan update mein due date bhej di
             },
           });
         }
@@ -75,6 +88,7 @@ export function CreateTaskModal({ isOpen, onClose, taskToEdit }: CreateTaskModal
           priority,
           projectId: selectedProjectId,
           status: "TODO",
+          dueDate: dueDate ? new Date(dueDate) : undefined, // <-- Yahan create mein due date bhej di
         });
       }
 
@@ -140,27 +154,39 @@ export function CreateTaskModal({ isOpen, onClose, taskToEdit }: CreateTaskModal
               </select>
             </div>
 
-            {projects.length > 0 && (
-              <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1">Project</label>
-                <select
-                  disabled={isSubmitting}
-                  value={projectId || getId(projects[0])}
-                  onChange={(e) => setProjectId(e.target.value)}
-                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-hidden focus:ring-1 focus:ring-primary"
-                >
-                  {projects.map((proj) => {
-                    const pId = getId(proj);
-                    return (
-                      <option key={pId} value={pId}>
-                        {proj.name}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-            )}
+            {/* Due Date Input Field Naya Add Kiya Hai */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground block mb-1">Due Date</label>
+              <input
+                type="date"
+                disabled={isSubmitting}
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-hidden focus:ring-1 focus:ring-primary"
+              />
+            </div>
           </div>
+
+          {projects.length > 0 && (
+            <div>
+              <label className="text-xs font-medium text-muted-foreground block mb-1">Project</label>
+              <select
+                disabled={isSubmitting}
+                value={projectId || getId(projects[0])}
+                onChange={(e) => setProjectId(e.target.value)}
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-hidden focus:ring-1 focus:ring-primary"
+              >
+                {projects.map((proj) => {
+                  const pId = getId(proj);
+                  return (
+                    <option key={pId} value={pId}>
+                      {proj.name}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-2">
             <button

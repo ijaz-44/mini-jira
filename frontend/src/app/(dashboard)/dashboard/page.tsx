@@ -4,22 +4,15 @@ import { useState, useMemo } from "react";
 import { useTasks } from "@/hooks/useTasks";
 import { useProjects } from "@/hooks/useProjects";
 import { StatsCard } from "@/components/dashboard/StatsCard";
-import { KanbanCard } from "@/components/kanban/KanbanCard";
+import { KanbanBoard } from "@/components/kanban/KanbanBoard";
 import { CreateTaskModal } from "./CreateTaskModal";
 import { CheckCircle2, Clock, AlertCircle, FolderKanban, Plus, Loader2 } from "lucide-react";
 import { Task } from "@/types/task.types";
 
-const COLUMNS: { label: string; status: Task["status"] }[] = [
-  { label: "To Do", status: "TODO" },
-  { label: "In Progress", status: "IN_PROGRESS" },
-  { label: "Done", status: "DONE" },
-];
-
 export default function DashboardOverviewPage() {
-  const { tasks = [], isLoading: tasksLoading, updateStatus, deleteTask } = useTasks();
+  const { tasks = [], isLoading: tasksLoading, deleteTask } = useTasks();
   const { projects = [], isLoading: projectsLoading } = useProjects();
   
-  const [draggedId, setDraggedId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
@@ -36,14 +29,6 @@ export default function DashboardOverviewPage() {
       </div>
     );
   }
-
-  const handleDrop = (status: Task["status"]) => {
-    if (draggedId) {
-      // Fixed: Passing 2 separate arguments (taskId, status) as expected by useTasks
-      updateStatus?.(draggedId, status);
-      setDraggedId(null);
-    }
-  };
 
   const handleOpenCreateModal = () => {
     setEditingTask(null);
@@ -77,45 +62,14 @@ export default function DashboardOverviewPage() {
         </button>
       </div>
 
-      {/* Kanban Board */}
+      {/* Kanban Board Component */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">Kanban Task Board</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {COLUMNS.map((col) => {
-            const colTasks = tasks.filter((t) => t.status === col.status);
-            return (
-              <div
-                key={col.status}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => handleDrop(col.status)}
-                className="bg-card/50 border border-border rounded-xl p-4 min-h-87.5 flex flex-col gap-3"
-              >
-                <div className="flex justify-between items-center pb-2 border-b border-border">
-                  <span className="font-semibold text-sm">{col.label}</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
-                    {colTasks.length}
-                  </span>
-                </div>
-
-                <div className="space-y-3 flex-1">
-                  {colTasks.map((task) => (
-                    <div
-                      key={task.id || task._id}
-                      draggable
-                      onDragStart={() => setDraggedId(task.id || task._id || null)}
-                    >
-                      <KanbanCard 
-                        task={task} 
-                        onDelete={deleteTask}
-                        onEdit={handleOpenEditModal}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <KanbanBoard 
+          tasks={tasks} 
+          onEditTask={handleOpenEditModal} 
+          onDeleteTask={deleteTask} 
+        />
       </div>
 
       {/* Metrics */}

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, FolderKanban, CheckSquare, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { authService } from "@/services/auth.service";
 
 const links = [
   { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
@@ -14,11 +13,11 @@ const links = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await authService.logout();
+      await logout();
       window.location.href = "/login";
     } catch (err) {
       console.error("Logout failed", err);

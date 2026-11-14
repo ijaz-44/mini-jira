@@ -11,12 +11,7 @@ interface KanbanColumnProps {
   onDeleteTask?: (taskId: string) => void;
 }
 
-export function KanbanColumn({ 
-  title, 
-  tasks, 
-  onEditTask, 
-  onDeleteTask 
-}: KanbanColumnProps) {
+export function KanbanColumn({ title, tasks, onEditTask, onDeleteTask }: KanbanColumnProps) {
   return (
     <div className="flex-1 bg-muted/40 p-4 rounded-xl min-w-70 flex flex-col space-y-3 border border-border">
       <div className="flex items-center justify-between pb-2 border-b border-border">

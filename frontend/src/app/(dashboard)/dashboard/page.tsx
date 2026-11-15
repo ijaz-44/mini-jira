@@ -5,7 +5,8 @@ import { useTasks } from "@/hooks/useTasks";
 import { useProjects } from "@/hooks/useProjects";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { KanbanBoard } from "@/components/kanban/KanbanBoard";
-import { CreateTaskModal } from "./CreateTaskModal";
+import { TaskModal } from "@/components/modals/TaskModal";
+import { TaskDetailsModal } from "@/components/modals/TaskDetailsModal";
 import { CheckCircle2, Clock, AlertCircle, FolderKanban, Plus, Loader2 } from "lucide-react";
 import { Task } from "@/types/task.types";
 
@@ -83,8 +84,11 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
+      {/* URL-Synced Task Details Popup */}
+      <TaskDetailsModal />
+
       {/* Reusable Create/Edit Task Modal */}
-      <CreateTaskModal 
+      <TaskModal 
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 
         taskToEdit={editingTask}

@@ -1,16 +1,23 @@
 'use client';
 
+import { useState } from "react";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/types/task.types";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { ArrowRight } from "lucide-react";
-import TaskDetailsModal from "./TaskDetailsModal";
+import { Plus, Loader2 } from "lucide-react";
+import { TaskCard } from "./TaskCard";
+import { TaskModal } from "@/components/modals/TaskModal";
+import { TaskDetailsModal } from "@/components/modals/TaskDetailsModal";
 
 export default function TasksPage() {
-  const { tasks, isLoading } = useTasks();
+  const { tasks, isLoading, deleteTask } = useTasks();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  // Modal states for Create/Edit Task
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const handleTaskClick = (taskId: string) => {
     if (!taskId) return;
@@ -19,80 +26,88 @@ export default function TasksPage() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
+  const handleOpenCreateModal = () => {
+    setEditingTask(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (task: Task) => {
+    setEditingTask(task);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingTask(null);
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    if (confirm("Are you sure you want to delete this task?")) {
+      try {
+        await deleteTask(taskId);
+      } catch (error) {
+        console.error("Failed to delete task:", error);
+      }
+    }
+  };
+
   if (isLoading) {
-    return <div className="text-sm text-muted-foreground p-4">Loading tasks...</div>;
+    return (
+      <div className="flex items-center justify-center p-12 text-sm text-muted-foreground gap-2">
+        <Loader2 className="w-4 h-4 animate-spin" /> Loading tasks...
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Tasks</h1>
-        <p className="text-sm text-muted-foreground">Manage and view all workspace tasks</p>
+      {/* Page Header with Create Task Button */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Tasks</h1>
+          <p className="text-sm text-muted-foreground">Manage and view all workspace tasks</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleOpenCreateModal}
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground hover:opacity-90 font-medium text-sm rounded-lg transition-all shadow-xs active:scale-95 cursor-pointer"
+        >
+          <Plus className="w-4 h-4" />
+          Create Task
+        </button>
       </div>
 
+      {/* Tasks List Container */}
       <div className="bg-card text-card-foreground p-6 rounded-xl border border-border shadow-sm">
         {!tasks || tasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No tasks found.</p>
+          <p className="text-sm text-muted-foreground text-center py-8">No tasks found.</p>
         ) : (
           <div className="space-y-3">
             {tasks.map((task: Task) => {
               const taskId = task._id || task.id || "";
-              
               return (
-                <div
+                <TaskCard
                   key={taskId || task.title}
-                  onClick={() => handleTaskClick(taskId)}
-                  className="flex items-center justify-between p-4 bg-muted/40 hover:bg-muted/80 rounded-lg border border-border/60 transition-colors cursor-pointer group"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
-                        {task.title}
-                      </h3>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                        task.priority === "URGENT" || task.priority === "HIGH"
-                          ? "bg-destructive/10 text-destructive border border-destructive/20" 
-                          : "bg-secondary text-secondary-foreground"
-                      }`}>
-                        {task.priority}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-1">
-                      {task.description || "No description provided."}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    {/* Due Date added here */}
-                    {task.dueDate && (
-                      <span className="text-xs text-muted-foreground hidden sm:inline-block">
-                        {new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                      </span>
-                    )}
-
-                    <span className="text-xs px-2.5 py-1 bg-secondary text-secondary-foreground rounded font-medium">
-                      {task.status}
-                    </span>
-                    
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTaskClick(taskId);
-                      }}
-                      className="p-2 text-muted-foreground group-hover:text-foreground transition-colors"
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                  task={task}
+                  onViewDetails={handleTaskClick}
+                  onEdit={handleOpenEditModal}
+                  onDelete={handleDeleteTask}
+                />
               );
             })}
           </div>
         )}
       </div>
 
+      {/* URL-Synced Task Details Popup */}
       <TaskDetailsModal />
+
+      {/* Reusable Create / Edit Task Modal */}
+      <TaskModal 
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal} 
+        taskToEdit={editingTask}
+      />
     </div>
   );
 }

@@ -17,8 +17,8 @@ export function KanbanBoard({ tasks = [], onEditTask, onDeleteTask }: {
 }) {
   return (
     <div className="w-full overflow-x-auto pb-4 pt-1">
-      {/* Flex container with safe gap and min-width to prevent squishing */}
-      <div className="flex gap-4 min-w-[1000px] items-start">
+      {/* min-w-max ensures columns never get squished and take their exact required width */}
+      <div className="flex gap-4 min-w-max items-start">
         {COLUMNS.map((col) => {
           const columnTasks = tasks.filter((t) => t.status === col.status);
           return (

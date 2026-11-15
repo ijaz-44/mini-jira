@@ -2,31 +2,25 @@
 
 import { useState } from "react";
 import { useProjects } from "@/hooks/useProjects";
-import { Plus, Layers, X, Loader2 } from "lucide-react";
+import { Plus, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ProjectCardActions from "./ProjectCardActions";
+import ProjectCard, { ProjectType } from "./ProjectCard";
+import { ProjectModal } from "@/components/modals/ProjectModal";
 
 export default function ProjectsPage() {
-  const { projects, isLoading, createProject, isCreating } = useProjects();
+  const { projects, isLoading } = useProjects();
   
-  const [isOpen, setIsOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
+  const handleCreateClick = () => {
+    setSelectedProject(null);
+    setIsModalOpen(true);
+  };
 
-    setErrorMsg("");
-    try {
-      await createProject({ name: name.trim(), description: description.trim() });
-      setName("");
-      setDescription("");
-      setIsOpen(false);
-    } catch (err: any) {
-      setErrorMsg(err?.message || "Something went wrong. Please try again.");
-    }
+  const handleEditClick = (project: ProjectType) => {
+    setSelectedProject(project);
+    setIsModalOpen(true);
   };
 
   return (
@@ -40,8 +34,8 @@ export default function ProjectsPage() {
         </div>
         
         <Button 
-          onClick={() => setIsOpen(true)}
-          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+          onClick={handleCreateClick}
+          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm cursor-pointer"
         >
           <Plus className="w-4 h-4" /> Create Project
         </Button>
@@ -63,81 +57,28 @@ export default function ProjectsPage() {
               Get started by creating your first project workspace.
             </p>
           </div>
-          <Button onClick={() => setIsOpen(true)} variant="outline" size="sm" className="mt-2">
+          <Button onClick={handleCreateClick} variant="outline" size="sm" className="mt-2 cursor-pointer">
             Create First Project
           </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {projects.map((project: any) => (
-            <ProjectCardActions 
+            <ProjectCard 
               key={project._id || project.id} 
               project={project} 
+              onEdit={handleEditClick}
             />
           ))}
         </div>
       )}
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md bg-card text-card-foreground border border-border rounded-xl p-6 shadow-lg space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h2 className="text-lg font-semibold">Create New Project</h2>
-              <button 
-                onClick={() => setIsOpen(false)} 
-                className="text-muted-foreground hover:text-foreground"
-                type="button"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {errorMsg && (
-              <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-xs rounded-lg text-center font-medium">
-                {errorMsg}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Project Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Next.js SaaS App"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Description
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="Brief summary of the project..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none text-foreground"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
-                <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isCreating}>
-                  {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create"}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Global Project Modal for Create/Edit */}
+      <ProjectModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        projectToEdit={selectedProject}
+      />
     </div>
   );
 }

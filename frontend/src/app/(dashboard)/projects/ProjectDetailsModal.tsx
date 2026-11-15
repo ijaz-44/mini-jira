@@ -1,15 +1,8 @@
-"use client";
+'use client';
 
 import { X, FolderKanban } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-export interface ProjectType {
-  _id?: string;
-  id?: string;
-  name?: string;
-  title?: string;
-  description?: string;
-}
+import { ProjectType } from "./ProjectCard";
 
 interface ProjectDetailsModalProps {
   project: ProjectType;
@@ -42,7 +35,7 @@ export default function ProjectDetailsModal({ project, onClose }: ProjectDetails
           <button
             type="button"
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-accent transition-colors"
+            className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-accent transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -81,7 +74,7 @@ export default function ProjectDetailsModal({ project, onClose }: ProjectDetails
             type="button"
             variant="outline"
             onClick={onClose}
-            className="hover:bg-accent hover:text-accent-foreground transition-colors"
+            className="hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
           >
             Close
           </Button>

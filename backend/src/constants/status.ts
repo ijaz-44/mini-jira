@@ -2,7 +2,7 @@
 export const TASK_STATUS = {
   TODO: "TODO",
   IN_PROGRESS: "IN_PROGRESS",
-  REVIEW: "REVIEW",
+  REVIEW: "IN_REVIEW",
   DONE: "DONE",
 } as const;
 

@@ -119,10 +119,11 @@ export function ProjectForm({ onSuccess, projectToEdit }: ProjectFormProps) {
           variant="outline" 
           onClick={onSuccess} 
           disabled={isSubmitting}
+          className="cursor-pointer"
         >
           Cancel
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} className="cursor-pointer">
           {isSubmitting && <Loader2 className="w-4 h-4 animate-spin mr-1.5" />}
           {isSubmitting 
             ? (isEditing ? "Saving..." : "Creating...") 

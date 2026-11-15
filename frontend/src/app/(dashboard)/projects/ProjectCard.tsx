@@ -1,49 +1,123 @@
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import ProjectCardActions from "./ProjectCardActions";
+'use client';
 
-interface ProjectCardProps {
-  project: {
-    _id: string;
-    title: string;
-    description?: string;
-  };
+import { useState } from "react";
+import { FolderKanban, MoreVertical, Pencil, Trash2, ArrowRight, Loader2 } from "lucide-react";
+import { useProjects } from "@/hooks/useProjects";
+import ProjectDetailsModal from "./ProjectDetailsModal";
+
+export interface ProjectType {
+  _id?: string;
+  id?: string;
+  name?: string;
+  title?: string;
+  description?: string;
 }
 
-export default function ProjectCard({ project }: ProjectCardProps) {
-  return (
-    <div className="group relative bg-card text-card-foreground border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-      <div>
-        {/* Header Section */}
-        <div className="flex justify-between items-start mb-2 gap-2">
-          <Link href={`/projects/${project._id}`} className="flex-1">
-            <h2 className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
-              {project.title}
-            </h2>
-          </Link>
+interface ProjectCardProps {
+  project: ProjectType;
+  onEdit: (project: ProjectType) => void;
+}
 
-          {/* Action Options (Edit & Delete) */}
-          <ProjectCardActions project={project} />
+export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
+  const [showMenu, setShowMenu] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const { deleteProject, isDeleting } = useProjects();
+
+  const projectTitle = project.name || project.title || "Untitled Project";
+  const projectId = project._id || project.id || "";
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete "${projectTitle}"?`)) return;
+    try {
+      await deleteProject(projectId);
+    } catch (err) {
+      console.error("Failed to delete project", err);
+    }
+  };
+
+  return (
+    <div className="group relative bg-card text-card-foreground border border-border/80 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-accent-foreground/20 transition-all duration-200 flex flex-col justify-between">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="p-2.5 bg-accent/50 text-foreground w-fit rounded-lg border border-border/50 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+            <FolderKanban className="w-5 h-5" />
+          </div>
+
+          {/* Action Menu Dropdown */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+
+            {showMenu && (
+              <div 
+                className="absolute right-0 mt-1 w-36 bg-popover text-popover-foreground rounded-md shadow-lg border border-border z-20 py-1"
+                onMouseLeave={() => setShowMenu(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    onEdit(project);
+                    setShowMenu(false);
+                  }}
+                  className="w-full text-left px-3 py-1.5 text-xs flex items-center gap-2 hover:bg-accent transition-colors cursor-pointer"
+                >
+                  <Pencil className="w-3.5 h-3.5" /> Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDelete();
+                    setShowMenu(false);
+                  }}
+                  disabled={isDeleting}
+                  className="w-full text-left px-3 py-1.5 text-xs text-destructive flex items-center gap-2 hover:bg-accent transition-colors cursor-pointer"
+                >
+                  {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />} 
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Description */}
-        <Link href={`/projects/${project._id}`} className="block">
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {project.description || "No description provided."}
-          </p>
-        </Link>
+        <div>
+          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+            {projectTitle}
+          </h3>
+          {project.description ? (
+            <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
+              {project.description}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground/60 italic mt-1.5">
+              No description provided
+            </p>
+          )}
+        </div>
       </div>
 
-      {/* View Details Link */}
-      <div className="mt-4 pt-3 border-t border-border flex items-center justify-end">
-        <Link
-          href={`/projects/${project._id}`}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+      <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground">
+        <span className="capitalize">Active Workspace</span>
+        <button
+          type="button"
+          onClick={() => setIsDetailsOpen(true)}
+          className="font-medium text-primary hover:underline flex items-center gap-1 transition-all cursor-pointer"
         >
-          <span>View details</span>
-          <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
+          View Details <ArrowRight className="w-3 h-3" />
+        </button>
       </div>
+
+      {isDetailsOpen && (
+        <ProjectDetailsModal
+          project={project}
+          onClose={() => setIsDetailsOpen(false)}
+        />
+      )}
     </div>
   );
 }

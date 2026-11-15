@@ -25,6 +25,7 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-5">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Projects</h1>
@@ -41,13 +42,14 @@ export default function ProjectsPage() {
         </Button>
       </div>
 
+      {/* Content Section */}
       {isLoading ? (
         <div className="flex items-center gap-2 p-4 text-sm text-muted-foreground">
           <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
           <span>Loading projects...</span>
         </div>
       ) : !projects || projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-12 text-center bg-card text-card-foreground rounded-xl border border-border/60 shadow-sm space-y-3">
+        <div className="flex flex-col items-center justify-center p-12 text-center bg-card text-card-foreground rounded-[var(--radius)] border border-border/60 shadow-sm space-y-3">
           <div className="p-3 bg-muted rounded-full text-muted-foreground">
             <Layers className="w-6 h-6" />
           </div>

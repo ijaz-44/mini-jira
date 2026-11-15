@@ -79,7 +79,7 @@ export function ProjectForm({ onSuccess, projectToEdit }: ProjectFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {errorMsg && (
-        <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-xs rounded-lg text-center font-medium">
+        <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-xs rounded-[var(--radius)] text-center font-medium">
           {errorMsg}
         </div>
       )}
@@ -95,7 +95,7 @@ export function ProjectForm({ onSuccess, projectToEdit }: ProjectFormProps) {
           placeholder="e.g. Next.js SaaS App"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
+          className="w-full px-3 py-2 text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-colors placeholder:text-muted-foreground/60"
         />
       </div>
 
@@ -109,11 +109,11 @@ export function ProjectForm({ onSuccess, projectToEdit }: ProjectFormProps) {
           placeholder="Brief summary of the project..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none text-foreground"
+          className="w-full px-3 py-2 text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring resize-none text-foreground transition-colors placeholder:text-muted-foreground/60"
         />
       </div>
 
-      <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
+      <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
         <Button 
           type="button" 
           variant="outline" 

@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 
 export interface ProjectType {
@@ -78,8 +79,9 @@ export function ProjectForm({ onSuccess, projectToEdit }: ProjectFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Fixed: Removed opacity modifiers destructive/10 and destructive/20 */}
       {errorMsg && (
-        <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-xs rounded-[var(--radius)] text-center font-medium">
+        <div className="p-3 bg-muted border border-destructive text-destructive text-xs rounded-lg text-center font-medium">
           {errorMsg}
         </div>
       )}
@@ -88,14 +90,13 @@ export function ProjectForm({ onSuccess, projectToEdit }: ProjectFormProps) {
         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Project Name
         </label>
-        <input
+        <Input
           type="text"
           required
           disabled={isSubmitting}
           placeholder="e.g. Next.js SaaS App"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-colors placeholder:text-muted-foreground/60"
         />
       </div>
 
@@ -103,13 +104,14 @@ export function ProjectForm({ onSuccess, projectToEdit }: ProjectFormProps) {
         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Description
         </label>
+        {/* Fixed: Removed ring/50 and dark:bg-input/30 opacity modifiers */}
         <textarea
           rows={3}
           disabled={isSubmitting}
           placeholder="Brief summary of the project..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring resize-none text-foreground transition-colors placeholder:text-muted-foreground/60"
+          className="w-full rounded-lg border border-input bg-muted px-2.5 py-2 text-base text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none"
         />
       </div>
 

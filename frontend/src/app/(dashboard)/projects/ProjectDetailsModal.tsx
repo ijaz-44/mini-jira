@@ -20,7 +20,7 @@ export default function ProjectDetailsModal({ project, onClose }: ProjectDetails
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-primary/10 text-primary rounded-lg border border-primary/20">
+            <div className="p-2.5 bg-muted text-primary rounded-lg border border-border">
               <FolderKanban className="w-5 h-5" />
             </div>
             <div>

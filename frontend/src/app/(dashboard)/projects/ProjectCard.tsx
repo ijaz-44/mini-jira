@@ -39,7 +39,8 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
     <div className="group relative bg-card text-card-foreground border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="p-2.5 bg-muted text-foreground w-fit rounded-lg border border-border group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+          {/* Fixed: Replaced opacity /10 with clean accent/muted tokens */}
+          <div className="p-2.5 bg-muted text-foreground w-fit rounded-lg border border-border group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
             <FolderKanban className="w-5 h-5" />
           </div>
 

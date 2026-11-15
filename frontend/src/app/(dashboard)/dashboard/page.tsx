@@ -7,6 +7,7 @@ import { StatsCard } from "@/components/dashboard/StatsCard";
 import { KanbanBoard } from "@/components/kanban/KanbanBoard";
 import { TaskModal } from "@/components/modals/TaskModal";
 import { TaskDetailsModal } from "@/components/modals/TaskDetailsModal";
+import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, AlertCircle, FolderKanban, Plus, Loader2 } from "lucide-react";
 import { Task } from "@/types/task.types";
 
@@ -26,7 +27,7 @@ export default function DashboardOverviewPage() {
   if (tasksLoading || projectsLoading) {
     return (
       <div className="flex items-center justify-center p-12 text-sm text-muted-foreground gap-2">
-        <Loader2 className="w-4 h-4 animate-spin" /> Loading overview...
+        <Loader2 className="w-4 h-4 animate-spin text-primary" /> Loading overview...
       </div>
     );
   }
@@ -51,21 +52,22 @@ export default function DashboardOverviewPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard Overview</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard Overview</h1>
           <p className="text-sm text-muted-foreground">Manage your workspace and task statuses</p>
         </div>
-        <button
+        
+        {/* Standardized Button component matching Projects page */}
+        <Button 
           onClick={handleOpenCreateModal}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground hover:opacity-90 font-medium text-sm rounded-lg transition-all shadow-xs active:scale-95 cursor-pointer"
+          className="gap-2 cursor-pointer"
         >
-          <Plus className="w-4 h-4" />
-          Create Task
-        </button>
+          <Plus className="w-4 h-4" /> Create Task
+        </Button>
       </div>
 
       {/* Kanban Board Component */}
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Kanban Task Board</h2>
+        <h2 className="text-lg font-semibold text-foreground">Kanban Task Board</h2>
         <KanbanBoard 
           tasks={tasks} 
           onEditTask={handleOpenEditModal} 
@@ -75,7 +77,7 @@ export default function DashboardOverviewPage() {
 
       {/* Metrics */}
       <div className="space-y-4 pt-4 border-t border-border">
-        <h2 className="text-lg font-semibold">Metrics Overview</h2>
+        <h2 className="text-lg font-semibold text-foreground">Metrics Overview</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard title="Total Projects" value={projects.length} icon={FolderKanban} />
           <StatsCard title="In Progress" value={stats.inProgress} icon={Clock} />

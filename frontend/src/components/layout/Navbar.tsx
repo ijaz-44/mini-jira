@@ -13,14 +13,15 @@ export function Navbar() {
       <h2 className="text-lg font-semibold text-foreground tracking-tight">Workspace</h2>
       <div className="flex items-center gap-3">
         <div className="relative">
+          {/* Fixed: Removed primary/10 and primary/20 opacity modifiers */}
           <button
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}
             disabled={isUpdatingRole}
-            className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 font-medium"
+            className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg bg-muted text-foreground border border-border font-medium cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
           >
             {isUpdatingRole ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
             ) : (
               <>
                 <span>Role: {user?.role?.toLowerCase() || "user"}</span>
@@ -30,7 +31,7 @@ export function Navbar() {
           </button>
 
           {isOpen && !isUpdatingRole && (
-            <div className="absolute right-0 top-full mt-2 w-40 bg-card border border-border rounded-lg shadow-lg p-1 z-50">
+            <div className="absolute right-0 top-full mt-2 w-40 bg-popover text-popover-foreground border border-border rounded-lg shadow-lg p-1 z-50">
               {["EMPLOYEE", "MANAGER", "ADMIN"].map((role) => (
                 <button
                   key={role}
@@ -39,7 +40,7 @@ export function Navbar() {
                     await updateRole(role);
                     setIsOpen(false);
                   }}
-                  className="w-full text-left px-3 py-2 text-xs rounded-md hover:bg-muted"
+                  className="w-full text-left px-3 py-2 text-xs rounded-md hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                 >
                   {role.toLowerCase()}
                 </button>

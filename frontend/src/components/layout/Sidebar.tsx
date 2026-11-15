@@ -25,7 +25,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-64 border-r border-border bg-card text-card-foreground flex flex-col justify-between p-4 min-h-screen">
+    <aside className="w-64 shrink-0 border-r border-border bg-card text-card-foreground flex flex-col justify-between p-4 min-h-screen">
       <div className="space-y-6">
         <div className="text-xl font-bold text-primary px-2 tracking-tight">
           Mini Jira
@@ -57,9 +57,11 @@ export function Sidebar() {
           <p className="font-medium text-foreground truncate">{user?.email}</p>
           <p className="capitalize text-muted-foreground">{user?.role?.toLowerCase()}</p>
         </div>
+        {/* Fixed: Removed destructive/10 opacity modifier */}
         <button
+          type="button"
           onClick={handleLogout}
-          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 rounded-lg transition-colors font-medium"
+          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-muted hover:text-destructive rounded-lg transition-colors font-medium cursor-pointer"
         >
           <LogOut className="w-4 h-4" /> Logout
         </button>

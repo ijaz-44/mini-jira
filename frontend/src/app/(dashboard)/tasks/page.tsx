@@ -5,6 +5,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/types/task.types";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Plus, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { TaskCard } from "./TaskCard";
 import { TaskModal } from "@/components/modals/TaskModal";
 import { TaskDetailsModal } from "@/components/modals/TaskDetailsModal";
@@ -54,7 +55,7 @@ export default function TasksPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12 text-sm text-muted-foreground gap-2">
-        <Loader2 className="w-4 h-4 animate-spin" /> Loading tasks...
+        <Loader2 className="w-4 h-4 animate-spin text-primary" /> Loading tasks...
       </div>
     );
   }
@@ -67,14 +68,14 @@ export default function TasksPage() {
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Tasks</h1>
           <p className="text-sm text-muted-foreground">Manage and view all workspace tasks</p>
         </div>
-        <button
-          type="button"
+        
+        {/* Standardized Button component matching other pages */}
+        <Button 
           onClick={handleOpenCreateModal}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground hover:opacity-90 font-medium text-sm rounded-lg transition-all shadow-xs active:scale-95 cursor-pointer"
+          className="gap-2 cursor-pointer"
         >
-          <Plus className="w-4 h-4" />
-          Create Task
-        </button>
+          <Plus className="w-4 h-4" /> Create Task
+        </Button>
       </div>
 
       {/* Tasks List Container */}

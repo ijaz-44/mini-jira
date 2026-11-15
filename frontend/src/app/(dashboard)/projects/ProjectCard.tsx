@@ -36,10 +36,10 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
   };
 
   return (
-    <div className="group relative bg-card text-card-foreground border border-border/80 rounded-[var(--radius)] p-5 shadow-sm hover:shadow-md hover:border-accent-foreground/20 transition-all duration-200 flex flex-col justify-between">
+    <div className="group relative bg-card text-card-foreground border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="p-2.5 bg-accent/50 text-foreground w-fit rounded-[var(--radius)] border border-border/50 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+          <div className="p-2.5 bg-muted text-foreground w-fit rounded-lg border border-border group-hover:bg-primary/10 group-hover:text-primary transition-colors">
             <FolderKanban className="w-5 h-5" />
           </div>
 
@@ -48,14 +48,14 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
             <button
               type="button"
               onClick={() => setShowMenu(!showMenu)}
-              className="p-1.5 hover:bg-accent hover:text-accent-foreground rounded-[var(--radius)] text-muted-foreground transition-colors cursor-pointer"
+              className="p-1.5 hover:bg-accent hover:text-accent-foreground rounded-lg text-muted-foreground transition-colors cursor-pointer"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
 
             {showMenu && (
               <div 
-                className="absolute right-0 mt-1 w-36 bg-popover text-popover-foreground rounded-[var(--radius)] shadow-lg border border-border z-20 py-1"
+                className="absolute right-0 mt-1 w-36 bg-popover text-popover-foreground rounded-lg shadow-lg border border-border z-20 py-1"
                 onMouseLeave={() => setShowMenu(false)}
               >
                 <button
@@ -75,7 +75,7 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
                     setShowMenu(false);
                   }}
                   disabled={isDeleting}
-                  className="w-full text-left px-3 py-1.5 text-xs text-destructive flex items-center gap-2 hover:bg-accent transition-colors cursor-pointer"
+                  className="w-full text-left px-3 py-1.5 text-xs text-destructive flex items-center gap-2 hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                 >
                   {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />} 
                   Delete
@@ -94,15 +94,15 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
               {project.description}
             </p>
           ) : (
-            <p className="text-xs text-muted-foreground/60 italic mt-1.5">
+            <p className="text-xs text-muted-foreground italic mt-1.5">
               No description provided
             </p>
           )}
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground">
-        <span className="capitalize">Active Workspace</span>
+      <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+        <span className="capitalize font-medium">Active Workspace</span>
         <button
           type="button"
           onClick={() => setIsDetailsOpen(true)}

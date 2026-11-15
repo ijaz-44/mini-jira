@@ -2,7 +2,7 @@
 
 import { Task } from "@/types/task.types";
 import { X } from "lucide-react";
-import { TaskForm } from "./TaskForm";
+import { TaskForm } from "@/components/modals/TaskForm";
 
 interface CreateTaskModalProps {
   isOpen: boolean;

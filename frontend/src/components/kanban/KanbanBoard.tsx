@@ -16,20 +16,24 @@ export function KanbanBoard({ tasks = [], onEditTask, onDeleteTask }: {
   onDeleteTask?: (taskId: string) => void; 
 }) {
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4 pt-1">
-      {COLUMNS.map((col) => {
-        const columnTasks = tasks.filter((t) => t.status === col.status);
-        return (
-          <KanbanColumn
-            key={col.status}
-            title={col.title}
-            status={col.status}
-            tasks={columnTasks}
-            onEditTask={onEditTask}
-            onDeleteTask={onDeleteTask}            
-          />
-        );
-      })}
+    <div className="w-full overflow-x-auto pb-4 pt-1">
+      {/* Flex container with safe gap and min-width to prevent squishing */}
+      <div className="flex gap-4 min-w-[1000px] items-start">
+        {COLUMNS.map((col) => {
+          const columnTasks = tasks.filter((t) => t.status === col.status);
+          return (
+            <div key={col.status} className="w-80 shrink-0">
+              <KanbanColumn
+                title={col.title}
+                status={col.status}
+                tasks={columnTasks}
+                onEditTask={onEditTask}
+                onDeleteTask={onDeleteTask}            
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
